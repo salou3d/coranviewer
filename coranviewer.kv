@@ -1,0 +1,135 @@
+
+<Label>
+    size_hint_y: None
+    height: '32dp'
+    font_family: 'noto'
+
+<BoxLayout>
+    #padding: [5, 5, 5, 5]
+    spacing: 5
+    canvas:
+        Color:
+            rgb: .3, .3, .3
+
+<Button>
+    size_hint_y: None
+    height: '32dp'
+    #spacig: '5dp'
+    #font_size: 20
+
+<CoranDirectoryWidget>:
+    FloatLayout:
+        size: root.size
+        canvas:
+            Color:
+                rgb: .3, .3, .3
+            Rectangle:
+                pos: self.pos
+                size: self.size
+        Label:
+            text: "No Directory chosen!"
+            size_hint: None, None
+            height: "32dp"
+            pos_hint: {'center_x': .5, 'center_y': .53}
+        Button:
+            text: "Choose Directory"
+            size_hint: None, None
+            width: "200dp"
+            pos_hint: {'center_x': 0.5, 'center_y': .47}
+            on_release: root.open_view()
+
+<CoranDirectoryModalView>:
+
+    text_input: text_input
+    auto_dismiss: False
+    BoxLayout:
+        size: root.size
+        orientation: "vertical"
+        canvas:
+            Color:
+                rgb: .3, .3, .3
+            Rectangle:
+                pos: self.pos
+                size: self.size
+        TextInput:
+            id: text_input
+            size_hint_y: None
+            height: '32dp'
+            multiline: False
+
+        FileChooserIconView:
+            id: filechooser
+            dirselect: True
+            on_selection: text_input.text = self.selection and self.selection[0] or ''
+
+        BoxLayout:
+            size_hint_y: None
+            height: '33dp'
+            Button:
+                text: "Cancel"
+                on_release: root.dismiss()
+            Button:
+                text: "Save"
+                on_release:
+                    root.save(filechooser.path, text_input.text)
+                    root.dismiss()
+                    app.run()
+
+<CoranViewerWidget>:
+
+    BoxLayout:
+        id: bl_root
+        orientation: "vertical"
+        size: root.width, root.height
+        canvas:
+            Rectangle:
+                pos: self.pos
+                size: self.size
+
+        BoxLayout:
+            id: bl_header
+            #orientation: "horizontal"
+            size_hint_y: None
+            height: '33dp'
+            Label
+                text: ""
+            BoxLayout:
+                spacig: 5
+                Button:
+                    id: b_prev
+                    text: "<"
+                    size_hint_x: .33
+                    #width: '100dp'
+                    disabled: root.disable_previous()
+                    on_release:
+                        root.previous_page()
+                        app.current_page = root.current_page
+                TextInput:
+                    id: page_number
+                    size_hint: None, None
+                    height: '32dp'
+                    width: '50dp'
+                    multiline: False
+                    text: root.get_page_number()
+                    on_text:
+                        root.go_page(self.text)
+                        app.current_page = root.current_page
+                Label:
+                    id: lbl_pages
+                    size_hint_x: None
+                    width: '50dp'
+                    text: root.get_label_text()
+                Button:
+                    id: b_next
+                    text: ">"
+                    size_hint_x: .33
+                    disabled: root.disable_next()
+                    on_release:
+                        root.next_page()
+                        app.current_page = root.current_page
+            Label
+                text: ""
+        Image:
+            id: curr_page
+            source: root.get_page_path()
+
